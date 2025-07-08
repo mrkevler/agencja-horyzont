@@ -3,7 +3,49 @@ class CookieConsent {
     constructor() {
         this.cookieName = 'agencja_horyzont_consent';
         this.consentData = this.getConsentData();
+        this.isEnglish = this.detectLanguage();
+        this.translations = this.getTranslations();
         this.init();
+    }
+
+    detectLanguage() {
+        // Check if we're on English version
+        return window.location.pathname.includes('index-en.html') || 
+               window.location.pathname.includes('-en.html') ||
+               document.documentElement.lang === 'en';
+    }
+
+    getTranslations() {
+        return {
+            pl: {
+                title: "🍪 Ustawienia prywatności",
+                description: "Szanujemy Twoją prywatność i chcemy być transparentni w kwestii używanych plików cookie.",
+                necessary: "Niezbędne pliki cookie",
+                necessaryDesc: "Wymagane do podstawowego funkcjonowania strony",
+                analytics: "Analityczne",
+                analyticsDesc: "Pomagają nam zrozumieć, jak odwiedzający korzystają ze strony",
+                marketing: "Marketingowe",
+                marketingDesc: "Używane do wyświetlania spersonalizowanych reklam",
+                decline: "Odrzuć wszystkie",
+                acceptSelected: "Akceptuj wybrane",
+                acceptAll: "Akceptuj wszystkie",
+                footer: "Więcej informacji w naszej <a href=\"/polityka-prywatnosci.html\" target=\"_blank\">Polityce Prywatności</a>"
+            },
+            en: {
+                title: "🍪 Privacy Settings",
+                description: "We respect your privacy and want to be transparent about the cookies we use.",
+                necessary: "Necessary cookies",
+                necessaryDesc: "Required for basic website functionality",
+                analytics: "Analytics",
+                analyticsDesc: "Help us understand how visitors use the website",
+                marketing: "Marketing",
+                marketingDesc: "Used to display personalized advertisements",
+                decline: "Decline all",
+                acceptSelected: "Accept selected",
+                acceptAll: "Accept all",
+                footer: "More information in our <a href=\"/privacy-policy-en.html\" target=\"_blank\">Privacy Policy</a>"
+            }
+        };
     }
 
     init() {
@@ -31,11 +73,13 @@ class CookieConsent {
     createConsentBanner() {
         const banner = document.createElement('div');
         banner.className = 'cookie-consent-banner';
+        const t = this.translations[this.isEnglish ? 'en' : 'pl'];
+        
         banner.innerHTML = `
             <div class="consent-content">
                 <div class="consent-header">
-                    <h3>🍪 Ustawienia prywatności</h3>
-                    <p>Szanujemy Twoją prywatność i chcemy być transparentni w kwestii używanych plików cookie.</p>
+                    <h3>${t.title}</h3>
+                    <p>${t.description}</p>
                 </div>
                 
                 <div class="consent-categories">
@@ -46,8 +90,8 @@ class CookieConsent {
                                 <span class="slider"></span>
                             </label>
                             <div class="category-info">
-                                <h4>Niezbędne pliki cookie</h4>
-                                <p>Wymagane do podstawowego funkcjonowania strony</p>
+                                <h4>${t.necessary}</h4>
+                                <p>${t.necessaryDesc}</p>
                             </div>
                         </div>
                     </div>
@@ -59,8 +103,8 @@ class CookieConsent {
                                 <span class="slider"></span>
                             </label>
                             <div class="category-info">
-                                <h4>Analityczne</h4>
-                                <p>Pomagają nam zrozumieć, jak odwiedzający korzystają ze strony</p>
+                                <h4>${t.analytics}</h4>
+                                <p>${t.analyticsDesc}</p>
                             </div>
                         </div>
                     </div>
@@ -72,21 +116,21 @@ class CookieConsent {
                                 <span class="slider"></span>
                             </label>
                             <div class="category-info">
-                                <h4>Marketingowe</h4>
-                                <p>Używane do wyświetlania spersonalizowanych reklam</p>
+                                <h4>${t.marketing}</h4>
+                                <p>${t.marketingDesc}</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="consent-buttons">
-                    <button type="button" class="btn-decline">Odrzuć wszystkie</button>
-                    <button type="button" class="btn-accept-selected">Akceptuj wybrane</button>
-                    <button type="button" class="btn-accept-all">Akceptuj wszystkie</button>
+                    <button type="button" class="btn-decline">${t.decline}</button>
+                    <button type="button" class="btn-accept-selected">${t.acceptSelected}</button>
+                    <button type="button" class="btn-accept-all">${t.acceptAll}</button>
                 </div>
                 
                 <div class="consent-footer">
-                    <p>Więcej informacji w naszej <a href="/polityka-prywatnosci.html" target="_blank">Polityce Prywatności</a></p>
+                    <p>${t.footer}</p>
                 </div>
             </div>
         `;
@@ -208,6 +252,16 @@ class CookieConsent {
 
     // Method to show consent preferences (for settings page)
     showConsentSettings() {
+        // Remove existing banner if present
+        const existingBanner = document.querySelector('.cookie-consent-banner');
+        if (existingBanner) {
+            existingBanner.remove();
+        }
+        
+        // Refresh language detection in case user switched pages
+        this.isEnglish = this.detectLanguage();
+        
+        // Show consent banner again
         this.showConsentBanner();
     }
 
